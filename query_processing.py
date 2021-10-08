@@ -6,7 +6,7 @@ def select_query_doc_ids(string):
     if string in posting_list:
         return posting_list[string]
     else:
-        return ""
+        return []
 
 
 # tests
@@ -22,7 +22,7 @@ def test_DANISH_is_valid_documents():
 
 def test_THIS_IS_NOT_A_WORD_is_in_no_document():
     selected = select_query_doc_ids("THIS_IS_NOT_A_WORD")
-    assert selected == ""
+    assert selected == []
 
 
 test_DATE_is_every_document()

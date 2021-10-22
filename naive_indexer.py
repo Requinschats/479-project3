@@ -1,7 +1,7 @@
 from nltk import RegexpTokenizer
 import os
 from pathlib import Path
-
+from collections import OrderedDict
 from nltk.corpus import stopwords
 
 
@@ -32,14 +32,17 @@ def select_term_doc_id_list(token_array, doc_id):
     return list(map(lambda token: (token, doc_id), token_array_without_stop_words))
 
 
+def select_term_doc_list_without_duplicates(term_doc_id_list):
+    return list(set(term_doc_id_list))
+
+
+def select_valid_term_length_term_docId_list(term_doc_id_list):
+    return filter(lambda local_term_doc_id: len(local_term_doc_id[0]) > 1, term_doc_id_list)
+
+
 def select_formatted_term_doc_id_list(term_doc_id_list):
-    occurrence_dictionary = {}
-    for term_doc_id in term_doc_id_list:
-        occurrence_dictionary[term_doc_id[0]] = "true"
-    filtered_term_doc_id_list = filter(
-        lambda local_term_doc_id: local_term_doc_id not in occurrence_dictionary, term_doc_id_list)
-    filtered_term_doc_id_list = filter(lambda local_term_doc_id: len(local_term_doc_id[0]) > 1,
-                                       filtered_term_doc_id_list)
+    filtered_term_doc_id_list = select_term_doc_list_without_duplicates(term_doc_id_list)
+    filtered_term_doc_id_list = select_valid_term_length_term_docId_list(filtered_term_doc_id_list)
     return sorted(filtered_term_doc_id_list)
 
 
@@ -68,8 +71,10 @@ def merge_posting_lists(global_posting_list, document_posting_list):
 
 
 def select_global_posting_list():
+    print("Creating global posing list... \n\n")
     global_posting_list = {}
     for fileName in os.listdir("reuters21578")[:5]:
         document_posting_list = select_document_posting_list_from_file_name(fileName)
         global_posting_list = merge_posting_lists(global_posting_list, document_posting_list)
-    return global_posting_list
+    sorted_global_posting = dict(OrderedDict(sorted(global_posting_list.items())))
+    return sorted_global_posting

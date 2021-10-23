@@ -8,7 +8,6 @@ def select_query_doc_ids(string):
     else:
         return []
 
-
 # tests made from run on first 5 docs
 
 def test_DATE_is_every_document():

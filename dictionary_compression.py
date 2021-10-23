@@ -157,12 +157,21 @@ def output_positional_posting_stats():
     output_compression_stats(token_list, "Positional postings", True, True)
 
 
+def select_compressed_query(string):
+    string_list = [string]
+    token_list_without_numbers = select_token_list_without_numbers(string_list, True)
+    token_list_lower_case = select_lower_case_token_list(token_list_without_numbers, True, True)
+    token_list_without_stop_words = select_token_list_without_stop_words(token_list_lower_case, True)
+    compressed_token_list = select_stemmed_token_list(token_list_without_stop_words, True, True)
+    return compressed_token_list[0]
+
+
 output_distinct_term_stats()
 output_non_positional_stats()
 output_positional_posting_stats()
 
 compressed_index = select_compressed_global_index()
 
-print("cascavel: " + str(compressed_index["cascavel"]))
+print("cascavel: " + str(compressed_index["cascavel"])) # or use select_compressed_query()
 print("danish: " + str(compressed_index["danish"]))
 print("date: " + str(compressed_index["date"]))

@@ -4,7 +4,7 @@ from nltk import RegexpTokenizer
 from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
 
-from naive_indexer import select_doc_id
+from naive_indexer import select_doc_id, select_valid_term_length_term_docId_list
 
 
 def select_tokenized_document(string_document):
@@ -74,10 +74,11 @@ def select_token_list_without_stop_words(token_list, is_posting):
 def select_stemmed_token_list(token_list, is_posting, is_positional):
     stemmer = PorterStemmer()
     if is_posting:
-        stemmed_token_list = map(lambda token_docId: stemmer.stem(token_docId[0], token_docId[1]), token_list)
+        stemmed_token_list = map(lambda token_docId: (stemmer.stem(token_docId[0]), token_docId[1]),
+                                 token_list)
         return list(set(stemmed_token_list)) if not is_positional else list(stemmed_token_list)
     else:
-        return list(map(lambda string: stemmer.stem(string), token_list))
+        return list(map(lambda string: (stemmer.stem(string)), token_list))
 
 
 def add_entry_global_index(global_index, token, doc_id):
@@ -85,6 +86,30 @@ def add_entry_global_index(global_index, token, doc_id):
         global_index[token].append(doc_id)
     else:
         global_index[token] = [doc_id]
+
+
+def select_index_from_token_list(token_list):
+    token_list = list(select_valid_term_length_term_docId_list(token_list))
+    index = {}
+    for token_doc_id in token_list:
+        term = token_doc_id[0]
+        doc_id = token_doc_id[1]
+        if term in index:
+            index[term].append(doc_id)
+        else:
+            index[term] = [doc_id]
+    return index
+
+
+def select_compressed_global_index():
+    print("building compressed index...\n")
+    token_list = select_positional_posting_token_list()
+    token_list_without_numbers = select_token_list_without_numbers(token_list, True)
+    token_list_lower_case = select_lower_case_token_list(token_list_without_numbers, True, True)
+    token_list_without_stop_words = select_token_list_without_stop_words(token_list_lower_case,
+                                                                         True)
+    compressed_token_list = select_stemmed_token_list(token_list_without_stop_words, True, True)
+    return select_index_from_token_list(compressed_token_list)
 
 
 def output_variation(original_list, new_list):
@@ -111,7 +136,8 @@ def output_compression_stats(token_list, category, is_posting, is_positional=Fal
     print("Without stop words: " + str(len(token_list_without_stop_words)))
     output_variation(token_list_lower_case, token_list_without_stop_words)
 
-    token_list_stemmed = select_stemmed_token_list(token_list_without_stop_words, is_posting, is_positional)
+    token_list_stemmed = select_stemmed_token_list(token_list_without_stop_words, is_posting,
+                                                   is_positional)
     print("Stemming: " + str(len(token_list_stemmed)))
     output_variation(token_list_without_stop_words, token_list_stemmed)
 
@@ -134,3 +160,9 @@ def output_positional_posting_stats():
 output_distinct_term_stats()
 output_non_positional_stats()
 output_positional_posting_stats()
+
+compressed_index = select_compressed_global_index()
+
+print("cascavel: " + str(compressed_index["cascavel"]))
+print("danish: " + str(compressed_index["danish"]))
+print("date: " + str(compressed_index["date"]))

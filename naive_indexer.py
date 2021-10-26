@@ -15,7 +15,7 @@ def get_between_tokens(string, startToken, endToken, endOffset):
 
 
 def select_doc_id(document):
-    return get_between_tokens(document, 'NEWID="', '<DATE>', 3)
+    return int(get_between_tokens(document, 'NEWID="', '<DATE>', 3))
 
 
 def select_tokenized_array(string):
@@ -65,15 +65,16 @@ def merge_posting_lists(global_posting_list, document_posting_list):
     for term, doc_id in document_posting_list.items():
         if term in global_posting_list:
             global_posting_list[term].append(doc_id)
+            global_posting_list[term] = sorted(global_posting_list[term])
         else:
             global_posting_list[term] = [doc_id]
     return global_posting_list
 
 
 def select_global_posting_list():
-    print("Creating global posing list... \n\n")
+    print("Creating global posing list...")
     global_posting_list = {}
-    for fileName in os.listdir("reuters21578")[:5]:
+    for fileName in os.listdir("reuters21578"):
         document_posting_list = select_document_posting_list_from_file_name(fileName)
         global_posting_list = merge_posting_lists(global_posting_list, document_posting_list)
     sorted_global_posting = dict(OrderedDict(sorted(global_posting_list.items())))

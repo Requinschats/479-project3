@@ -17,7 +17,7 @@ def select_file_content(file_name):
 
 def select_nonpositional_posting_token_list():
     token_list = []
-    for file_name in os.listdir("reuters21578")[:5]:
+    for file_name in os.listdir("reuters21578"):
         file_content = select_file_content(file_name)
         tokenized_content = list(set(select_tokenized_document(file_content)))
         doc_id = select_doc_id(file_content)
@@ -28,7 +28,7 @@ def select_nonpositional_posting_token_list():
 
 def select_positional_posting_token_list():
     token_list = []
-    for file_name in os.listdir("reuters21578")[:5]:
+    for file_name in os.listdir("reuters21578"):
         file_content = select_file_content(file_name)
         tokenized_content = select_tokenized_document(file_content)
         doc_id = select_doc_id(file_content)
@@ -39,7 +39,7 @@ def select_positional_posting_token_list():
 
 def select_token_set():
     token_set = set()
-    for file_name in os.listdir("reuters21578")[:5]:
+    for file_name in os.listdir("reuters21578"):
         file_content = select_file_content(file_name)
         tokenized_content = select_tokenized_document(file_content)
         for token in tokenized_content:
@@ -96,13 +96,15 @@ def select_index_from_token_list(token_list):
         doc_id = token_doc_id[1]
         if term in index:
             index[term].append(doc_id)
+            index[term] = sorted(list(set(index[term])))
+
         else:
             index[term] = [doc_id]
     return index
 
 
 def select_compressed_global_index():
-    print("building compressed index...\n")
+    print("building compressed index (takes 30 seconds)...\n")
     token_list = select_positional_posting_token_list()
     token_list_without_numbers = select_token_list_without_numbers(token_list, True)
     token_list_lower_case = select_lower_case_token_list(token_list_without_numbers, True, True)
@@ -158,12 +160,17 @@ def output_positional_posting_stats():
 
 
 def select_compressed_query(string):
-    string_list = [string]
+    string_list = [(string, 0)]
     token_list_without_numbers = select_token_list_without_numbers(string_list, True)
     token_list_lower_case = select_lower_case_token_list(token_list_without_numbers, True, True)
-    token_list_without_stop_words = select_token_list_without_stop_words(token_list_lower_case, True)
+    token_list_without_stop_words = select_token_list_without_stop_words(token_list_lower_case,
+                                                                         True)
     compressed_token_list = select_stemmed_token_list(token_list_without_stop_words, True, True)
-    return compressed_token_list[0]
+    return compressed_token_list[0][0]
+
+
+def compressed_index_search(string, index):
+    return str(index[select_compressed_query(string)]) if select_compressed_query(string) in index else str([])
 
 
 output_distinct_term_stats()
@@ -172,6 +179,13 @@ output_positional_posting_stats()
 
 compressed_index = select_compressed_global_index()
 
-print("cascavel: " + str(compressed_index["cascavel"])) # or use select_compressed_query()
-print("danish: " + str(compressed_index["danish"]))
-print("date: " + str(compressed_index["date"]))
+# challenge queries
+print("pineapple: " + compressed_index_search("pineapple", compressed_index))
+print("Phillippines: " + compressed_index_search("Phillippines", compressed_index))
+print("Brierley: " + compressed_index_search("Brierley", compressed_index))
+print("Chrysler: " + compressed_index_search("Chrysler", compressed_index))
+
+# my initial queries
+print("cascavel: " + compressed_index_search("Cascavel", compressed_index))
+print("danish: " + compressed_index_search("danish", compressed_index))
+print("date: " + compressed_index_search("DATE", compressed_index))

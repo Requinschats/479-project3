@@ -1,8 +1,12 @@
+import time
+
 from nltk import RegexpTokenizer
 import os
 from pathlib import Path
 from collections import OrderedDict
 from nltk.corpus import stopwords
+
+from outputs import output_computing_time
 
 
 def select_string_array_without_stop_words(string_array):
@@ -71,11 +75,19 @@ def merge_posting_lists(global_posting_list, document_posting_list):
     return global_posting_list
 
 
-def select_global_posting_list():
-    print("Creating global posing list...")
+def select_global_posting_list(entry_limit):
+    start_time = time.time()
+    posting_size = 0
+
+    print("Creating Naive Indexer posing list...")
     global_posting_list = {}
     for fileName in os.listdir("reuters21578"):
+        if entry_limit and posting_size >= entry_limit:
+            output_computing_time("Naive indexer", start_time)
+            return
+
         document_posting_list = select_document_posting_list_from_file_name(fileName)
         global_posting_list = merge_posting_lists(global_posting_list, document_posting_list)
+        posting_size += len(document_posting_list)
     sorted_global_posting = dict(OrderedDict(sorted(global_posting_list.items())))
     return sorted_global_posting

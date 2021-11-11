@@ -9,3 +9,6 @@ from BM25.BM25 import BM25, select_reuters_fitted_BM25
 
 # Subproject II:
 search_engine = select_reuters_fitted_BM25()
+print(search_engine.search("Democrats’ welfare and healthcare reform policies"))
+print(search_engine.search("Drug company bankruptcies"))
+print(search_engine.search("George Bush"))

@@ -22,7 +22,7 @@ def select_updated_document_frequency(current_document_frequency, frequencies):
 def select_BM25_initial_values_from_corpus(corpus):
     term_frequency, document_frequency, inverse_document_frequency = [], {}, {}
     total_doc_length, corpus_size = [], 0
-    for document in corpus:
+    for doc_id, document in corpus:
         corpus_size += 1
         total_doc_length.append(len(document))
         frequencies = select_term_frequency_in_doc(document)
@@ -48,14 +48,17 @@ def select_BM25_denominator(BM25, frequency, index):
         index] / BM25.average_doc_length)
 
 
-def select_query_scores(query_score, query, corpus_size):
-    return [query_score(query, index) for index in range(corpus_size)]
+def select_query_scores(get_query_score, query, corpus):
+    scores = [get_query_score(query, doc_index, doc_id) for doc_index, (doc_id, _) in
+              enumerate(corpus)]
+    return sorted(scores)
 
 
 def select_tokenized_reuters21578_document_list():
-    tokenized_documents_list = []
+    doc_id_tokenized_documents_list = []
     for file_name in os.listdir("reuters21578"):
         file_content = Path('reuters21578/' + file_name).read_text()
+        doc_id = select_doc_id(file_content)
         tokenized_content = select_tokenized_array(file_content)
-        tokenized_documents_list.append(tokenized_content)
-    return tokenized_documents_list
+        doc_id_tokenized_documents_list.append((doc_id, tokenized_content))
+    return doc_id_tokenized_documents_list

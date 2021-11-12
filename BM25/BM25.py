@@ -1,10 +1,10 @@
 import BM25.selectors as s
 
 
-def select_reuters_fitted_BM25():
+def select_reuters_fitted_BM25(k1=1.5, b=0.75):
     print("Building BM25 reuters search engine...\n")
     tokenized_documents = s.select_tokenized_reuters21578_document_list()
-    bm25 = BM25()
+    bm25 = BM25(k1, b)
     bm25.initialize(tokenized_documents)
     return bm25
 

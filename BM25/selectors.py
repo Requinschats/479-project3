@@ -51,7 +51,7 @@ def select_BM25_denominator(BM25, frequency, index):
 def select_query_scores(get_query_score, query, corpus):
     scores = [get_query_score(query, doc_index, doc_id) for doc_index, (doc_id, _) in
               enumerate(corpus)]
-    return sorted(scores)
+    return list(reversed(sorted(scores)))
 
 
 def select_tokenized_reuters21578_document_list():

@@ -7,6 +7,7 @@ from Boolean_Search_Engine.BSE import BSE
 naive_indexer_limited_posting_list = ni.select_global_posting_list(entry_limit=10000)
 SPIMI_indexer_limited_posting_list = si.select_global_posting_list(entry_limit=10000)
 
+# final inverted index is created in BSE()
 boolean_search_engine = BSE()
 print(boolean_search_engine.search("pineapple"))
 print(boolean_search_engine.search("pineapple Under", conjonction="AND"))

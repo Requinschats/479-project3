@@ -26,11 +26,25 @@ def select_docs_from_AND_query(query, posting_list):
     return sorted(query_matching_documents)
 
 
+def sorted_tuples_by_second(tuples_list):
+    return list(reversed(sorted(tuples_list, key=lambda tup: tup[1])))
+
+
+def select_query_matching_documents_with_keyword_count(query_matching_documents):
+    doc_id_keyword_count = {}
+    for doc_id in query_matching_documents:
+        if doc_id in doc_id_keyword_count:
+            doc_id_keyword_count[doc_id] += 1
+        else:
+            doc_id_keyword_count[doc_id] = 0
+    return doc_id_keyword_count.items()
+
+
 def select_docs_from_OR_query(query, posting_list):
     query_tokens = query.split()
     query_matching_documents = []
     for term in query_tokens:
         if term not in posting_list: continue
         query_matching_documents += posting_list[term]
-        query_matching_documents = list(set(query_matching_documents))
-    return sorted(query_matching_documents)
+    return sorted_tuples_by_second(
+        select_query_matching_documents_with_keyword_count(query_matching_documents))

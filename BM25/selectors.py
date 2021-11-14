@@ -40,12 +40,12 @@ def select_average_doc_length(total_doc_length, corpus_size):
 
 
 def select_BM25_numerator(BM25, term, frequency):
-    return BM25.inverse_document_frequency[term] * frequency * (BM25.k1 + 1)
+    return BM25.inverse_document_frequency[term] * (BM25.k1 + 1) * frequency
 
 
 def select_BM25_denominator(BM25, frequency, index):
-    return frequency + BM25.k1 * (1 - BM25.b + BM25.b * BM25.total_doc_length[
-        index] / BM25.average_doc_length)
+    return BM25.k1 * (1 - BM25.b + BM25.b * BM25.total_doc_length[
+        index] / BM25.average_doc_length) + frequency
 
 
 def select_query_scores(get_query_score, query, corpus):

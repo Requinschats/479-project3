@@ -13,7 +13,7 @@ class BM25:
     # from textbook
     # k1 calibrates the document term frequency scaling
     # b determines the scaling by document length
-    def __init__(self, k1=1.60, b=0.75):
+    def __init__(self, k1=1.60, b=0.9):
         self.b, self.k1 = b, k1
 
     def initialize_term_inverse_document_frequency(self, term, frequency):
